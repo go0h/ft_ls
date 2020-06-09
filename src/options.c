@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/12 11:09:56 by pcredibl          #+#    #+#             */
-/*   Updated: 2020/06/07 23:33:10 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/09 20:56:56 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ static void	usage(void)
 	exit(EXIT_SUCCESS);
 }
 
-static int	check_flags(char *flags, long int options)
+static int	check_flags(char *flags, size_t options)
 {
 	while (*flags && options)
 	{
@@ -42,7 +42,7 @@ static int	check_flags(char *flags, long int options)
 	return (options ? 0 : 1);
 }
 
-static int	check_option(char *str, long int *options)
+static int	check_option(char *str, size_t *options)
 {
 	int i;
 
@@ -56,7 +56,7 @@ static int	check_option(char *str, long int *options)
 			if (str[i] > 96 && str[i] < 123)
 				*options |= (1L << (str[i] - 71));
 			else if (str[i] > 64 && str[i] < 91)
-			    *options |= (1L << (str[i] - 65));
+				*options |= (1L << (str[i] - 65));
 			else
 				return (-1);
 			++i;

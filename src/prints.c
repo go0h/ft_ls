@@ -1,41 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   prints.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/06/07 14:22:13 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/09 20:55:30 by astripeb         ###   ########.fr       */
+/*   Created: 2020/06/09 08:32:58 by astripeb          #+#    #+#             */
+/*   Updated: 2020/06/09 20:36:24 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ls.h"
-#include <limits.h>
 
-int		main(int argc, char **argv)
+void	print_content(char *path, t_darr *list)
 {
-	int 	i;
-	t_opts	funct;
-	char	*pathname;
+	size_t	i;
+	t_file	*f_ptr;
 
-	funct = get_functors(options(argc, argv));
-	if (argc == 1)
-		return (EXIT_SUCCESS);
-	if (!(pathname = ft_strnew(PATH_MAX - 1)))
-		ft_exit(E_MALLOC, NULL);
-	i = 1;
-	while (i < argc)
+	i = 0;
+	ft_printf("%s:\n", path);
+	while (i < list->size)
 	{
-		if (*argv[i] == '-')
-		{
-			++i;
-			continue;
-		}
-		ft_strcpy(pathname, argv[i]);
-		ft_read_root(&funct, pathname);
+		f_ptr = (t_file*)ft_da_get_pointer(list, i);
+		ft_printf("%s ", f_ptr->d_ptr.d_name);
 		++i;
 	}
-	ft_strdel(&pathname);
-	return (EXIT_SUCCESS);
+	ft_printf("\n\n");
 }

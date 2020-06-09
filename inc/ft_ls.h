@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/07 14:21:18 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/07 23:45:14 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/09 20:35:06 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 # define FT_LS_H
 
 /*
-**	<sys/types.h>, <dirent.h>:	opendir, readdir, closedir
+**	<sys/stat.h>, <dirent.h>:	opendir, readdir, closedir
 **	<pwd.h>:					getpwuid
 **	<grp.h>:					getgrid
 **	<sys/xattr.h>:				listxattr
@@ -23,7 +23,7 @@
 **	<time.h>:					time, ctime
 */
 
-# include <sys/types.h>
+# include <sys/stat.h>
 # include <dirent.h>
 # include <pwd.h>
 # include <grp.h>
@@ -32,12 +32,16 @@
 # include <string.h>
 # include <time.h>
 
+# include "stdbool.h"
 # include "libft.h"
 
 enum
 {
 	USAGE,
-	INVALID_OPTION
+	INVALID_OPTION,
+	E_MALLOC,
+	E_OPEN,
+	E_SYS
 };
 
 # define LS_REC		0x20000
@@ -46,14 +50,37 @@ enum
 # define LS_REV_S	0x80000000000
 # define LS_TIME	0x200000000000
 
-typedef struct s_file
+typedef struct	s_file
 {
-	struct dirent	*d_ptr;
-	struct stat		*st_ptr;
+	struct dirent	d_ptr;
+	struct stat		f_stat;
 }				t_file;
+
+typedef struct	s_opts
+{
+	size_t		opts;
+	bool		(*isshow)(char *);
+	int			(*less)(void *, void *);
+	void		(*print)(char *path, t_darr *files);
+}				t_opts;
+
 
 size_t		options(int ac, char **av);
 
 void		print_opts(size_t opts);
 
+t_opts		get_functors(size_t opts);
+
+
+int			ft_read_root(t_opts *funct, char *path);
+
+void		print_content(char *path, t_darr *list);
+
+
+
+void		ft_exit(int err, char *path);
+
+void		ft_del_files(t_darr **files);
+
+void		ft_error_handle(char *msg);
 #endif
