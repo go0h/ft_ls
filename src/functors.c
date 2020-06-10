@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/08 20:33:03 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/09 20:57:09 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/10 17:56:09 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,19 +25,27 @@ bool	show_visible(char *filename)
 int		name_less(void *p1, void *p2)
 {
 	int		i;
+	int		j;
 	char	*s1;
 	char	*s2;
 
-	s1 = (char*)&((t_file*)p1)->d_ptr.d_name;
-	s2 = (char*)&((t_file*)p2)->d_ptr.d_name;
+	s1 = (char*)((t_file*)p1)->filename;
+	s2 = (char*)((t_file*)p2)->filename;
 	i = 0;
-	while (s1[i] || s2[i])
+	j = 0;
+	while (s1[i] && s2[j])
 	{
-		if (ft_tolower(s1[i]) != ft_tolower(s2[i]))
-			break ;
-		++i;
+		if (ft_isalnum(s1[i]) && ft_isalnum(s2[j]))
+		{
+			if (ft_tolower(s1[i]) != ft_tolower(s2[j]))
+				break ;
+			++i;
+			++j;
+		}
+		i += !ft_isalnum(s1[i]);
+		j += !ft_isalnum(s2[j]);
 	}
-	return ((ft_tolower(s1[i]) - ft_tolower(s2[i])) < 0);
+	return (ft_tolower(s1[i]) < ft_tolower(s2[j]));
 }
 
 int		rev_name(void *p1, void *p2)
@@ -70,7 +78,7 @@ t_opts	get_functors(size_t opts)
 
 	ft_bzero(&funct, sizeof(t_opts));
 	funct.opts = opts;
-	funct.print = &print_content;
+	funct.print = opts & LS_LONG ? &ft_long_print : &ft_short_print;
 	funct.isshow = opts & LS_ALL ? &show_all : &show_visible;
 	if (opts & LS_TIME)
 		funct.less = opts & LS_REV_S ? &rev_time : &time_less;

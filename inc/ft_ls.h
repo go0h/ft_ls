@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/07 14:21:18 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/09 20:35:06 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/10 18:44:19 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,16 +52,20 @@ enum
 
 typedef struct	s_file
 {
-	struct dirent	d_ptr;
+	char			*filename;
+	char			*link;
+	struct passwd	*user;
+	struct group	*group;
 	struct stat		f_stat;
 }				t_file;
+
 
 typedef struct	s_opts
 {
 	size_t		opts;
-	bool		(*isshow)(char *);
-	int			(*less)(void *, void *);
-	void		(*print)(char *path, t_darr *files);
+	bool		(*isshow)(char *filename);
+	int			(*less)(void *p1, void *p2);
+	void		(*print)(size_t opts, char *path, t_darr *files);
 }				t_opts;
 
 
@@ -74,8 +78,11 @@ t_opts		get_functors(size_t opts);
 
 int			ft_read_root(t_opts *funct, char *path);
 
-void		print_content(char *path, t_darr *list);
+void		print_path(char *path);
 
+void		ft_short_print(size_t opts, char *path, t_darr *list);
+
+void		ft_long_print(size_t opts, char *path, t_darr *list);
 
 
 void		ft_exit(int err, char *path);

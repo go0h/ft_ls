@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/07 19:33:08 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/09 11:45:55 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/10 13:51:13 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@ void	free_content(void *content)
 	fptr = (t_file*)content;
 	if (content != NULL)
 	{
-		ft_bzero(&fptr->f_stat, sizeof(struct stat));
-		// free(fptr->f_stat);
+		ft_strdel(&fptr->filename);
+		ft_strdel(&fptr->link);
 	}
 }
 

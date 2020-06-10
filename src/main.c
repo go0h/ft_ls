@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/07 14:22:13 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/09 20:55:30 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/10 20:02:20 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ int		main(int argc, char **argv)
 	int 	i;
 	t_opts	funct;
 	char	*pathname;
+	size_t	len;
 
 	funct = get_functors(options(argc, argv));
 	if (argc == 1)
@@ -32,8 +33,12 @@ int		main(int argc, char **argv)
 			++i;
 			continue;
 		}
-		ft_strcpy(pathname, argv[i]);
+		len = ft_strlen(argv[i]);
+		if (len > 1 && argv[i][len - 1] == '/')
+			--len;
+		ft_strncpy(pathname, argv[i], len);
 		ft_read_root(&funct, pathname);
+		ft_bzero(pathname, PATH_MAX);
 		++i;
 	}
 	ft_strdel(&pathname);
