@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/08 20:26:59 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/10 20:14:26 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/11 11:29:14 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ int			ft_read_dir(t_opts *funct, char *path, t_darr *files)
 	return (ret);
 }
 
-int			ft_read_link(char *path, t_file *file)
+int			ft_read_link(size_t opts, char *path, t_file *file)
 {
 	int		size;
 
@@ -72,8 +72,8 @@ void		ft_read_stats(size_t opts, t_darr *files, char *path)
 		file = (t_file*)ft_da_get_pointer(files, i);
 		ft_strcpy(&path[len], file->filename);
 		ret = lstat(path, &file->f_stat);
-		if (!ret && (opts & LS_LONG))
-			ret = ft_read_link(path, file);
+		if (!ret && opts & LS_LONG)
+			ret = ft_read_link(opts, path, file);
 		if (ret)
 		{
 			ft_da_del_index(files, i--);	// !!! remove bad file from files

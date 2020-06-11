@@ -1,10 +1,15 @@
 #!/bin/bash
 
-rm -rf my std diff_file
+MY="my"
+STD="std"
+DIFF="diff_file"
 
-./ft_ls -la / > ../my
-ls -la / > ../std
-cp ../my my
-cp ../std std
+rm -rf ${MY} ${STD} ${DIFF}
 
-diff my std | cat -e > diff_file
+./ft_ls -la ${1} > ../my
+ls -la ${1} > ../std
+cp ../${MY} ${MY}
+cp ../${STD} ${STD}
+
+diff ${MY} ${STD} | cat -e > ${DIFF}
+cat ${DIFF}

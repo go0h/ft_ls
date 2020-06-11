@@ -6,30 +6,30 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/09 08:32:58 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/10 22:48:23 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/11 14:21:34 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ls.h"
 
 /*
-	#define S_IFMT	00170000 MASK
-	#define S_IFSOCK	0140000 socket
-	#define S_IFLNK	0120000	symbolic (soft) link
-	#define S_IFREG  0100000 regular file
-	#define S_IFBLK  0060000 block device
-	#define S_IFDIR  0040000	directory
-	#define S_IFCHR  0020000	character device
-	#define S_IFIFO  0010000	FIFO or pipe
-
-	#define S_ISUID  0004000
-	#define S_ISGID  0002000
-	#define S_ISVTX  0001000
+**	S_IFMT	   00170000		MASK
+**	S_IFSOCK	0140000		socket
+**	S_IFLNK		0120000		symbolic (soft) link
+**	S_IFREG		0100000		regular file
+**	S_IFBLK		0060000		block device
+**	S_IFDIR		0040000		directory
+**	S_IFCHR		0020000		character device
+**	S_IFIFO		0010000		FIFO or pipe
+**
+**	S_ISUID		0004000		set-user-ID
+**	S_ISGID		0002000		set-group-ID
+**	S_ISVTX		0001000		sticky bit
 */
 
 static char	*get_roots(mode_t st_mode)
 {
-	static char	types[] = "fcdb-ls";
+	static char	types[] = "pcdb-ls";
 	static char	template[] = "-rwxrwxrwx";
 	static char	roots[11];
 
@@ -43,6 +43,9 @@ static char	*get_roots(mode_t st_mode)
 	roots[7] = st_mode & S_IROTH ? template[7] : '-';
 	roots[8] = st_mode & S_IWOTH ? template[8] : '-';
 	roots[9] = st_mode & S_IXOTH ? template[9] : '-';
+
+	if (st_mode & S_ISVTX)
+		roots[9] = 't';
 	return ((char*)&roots);
 }
 
@@ -69,30 +72,39 @@ static void	get_line_params(t_darr *files, size_t *params)
 	params[4] = ft_int_len(params[4]);
 }
 
-static char	*ft_ls_time(time_t c_time)
-{
-	char		now_time[256];
-	char		*file_time;
-	time_t		now;
+/*
+**	Compare year in last status change in file and now time
+**	swap time and year if not the same
+**				____________
+**			   |    |   |  |
+**	Thu Jun 11 10:21:31 2020
+**	   |____________|
+*/
 
-	now = time(NULL);
-	ft_strcpy(now_time, ctime(&now));
-	file_time = ft_strchr(ctime(&c_time), ' ');
-	// if (!(ft_strcmp(ft_strrchr(file_time, ' '), ft_strrchr(now_time, ' '))))
-		*ft_strrchr(file_time, ':') = 0;
-	// else
-	// {
-	// 	char *temp = ft_strrchr(file_time, ':');
-	// 	ft_strcpy(temp, ft_strrchr(temp, ' '));
-	// 	*ft_strrchr(file_time, '\n') = '\0';
-	// }
-	return (file_time);
+//	SIX MONTH ???
+
+void	ft_print_time(struct stat * s)
+{
+	time_t		n_time;
+	time_t		f_time;
+	char		*file_time;
+	static char	now_time[26];
+
+	f_time = s->st_ctime;
+	if ((s->st_mode & S_IFMT) == S_IFDIR)
+		f_time = s->st_mtime;
+	n_time = time(NULL);
+	ft_strcpy(now_time, ctime(&n_time));
+	file_time = ctime(&f_time);
+	if (!ft_strcmp(ft_strrchr(file_time, ' '), ft_strrchr(now_time, ' ')))
+		ft_printf("%.13s ", (file_time + 3));
+	else
+		ft_printf("%.7s %5.4s ", (file_time + 3), (file_time + 20));
 }
 
 void		print_path(char *path)
 {
 	static bool first = true;
-	size_t		len;
 
 	if (first)
 	{
@@ -104,13 +116,8 @@ void		print_path(char *path)
 		}
 		first = false;
 	}
-	else	// BAD!!
-	{
-		len = ft_strlen(path);
-		path[len - 1] = '\0';
-		ft_printf("\n%s:\n", path);
-		path[len - 1] = '/';
-	}
+	else
+		ft_printf("\n%.*s:\n", ft_strlen(path) - 1, path);
 }
 
 void		ft_long_print(size_t opts, char *path, t_darr *files)
@@ -127,13 +134,14 @@ void		ft_long_print(size_t opts, char *path, t_darr *files)
 	ft_printf("total %lu", params[0]);
 	while (i < files->size)
 	{
-		ft_printf("\n%s %*lu %*s %*s %*lu%s %s",\
+		ft_printf("\n%s %*lu %*s %*s %*lu",\
 			get_roots(f_ptr->f_stat.st_mode),\
 			params[1], f_ptr->f_stat.st_nlink,\
 			params[2], f_ptr->user->pw_name,\
 			params[3], f_ptr->group->gr_name,\
-			params[4], f_ptr->f_stat.st_size,\
-			ft_ls_time(f_ptr->f_stat.st_ctime), f_ptr->filename);
+			params[4], f_ptr->f_stat.st_size);
+		ft_print_time(&f_ptr->f_stat);
+		ft_printf("%s", f_ptr->filename);
 		if ((f_ptr->f_stat.st_mode & S_IFMT) == S_IFLNK)
 			ft_printf(" -> %s", f_ptr->link);
 		++i;
