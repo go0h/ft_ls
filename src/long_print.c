@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/09 08:32:58 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/11 14:21:34 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/11 22:31:43 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,12 @@ static char	*get_roots(mode_t st_mode)
 	roots[7] = st_mode & S_IROTH ? template[7] : '-';
 	roots[8] = st_mode & S_IWOTH ? template[8] : '-';
 	roots[9] = st_mode & S_IXOTH ? template[9] : '-';
-
+	if (st_mode & S_ISUID)
+		roots[3] = st_mode & S_IXUSR ? 's' : 'S';
+	if (st_mode & S_ISGID)
+		roots[6] = st_mode & S_IXGRP ? 's' : 'S';
 	if (st_mode & S_ISVTX)
-		roots[9] = 't';
+		roots[9] = st_mode & S_IXOTH ? 't' : 'T';
 	return ((char*)&roots);
 }
 
@@ -60,16 +63,16 @@ static void	get_line_params(t_darr *files, size_t *params)
 	while (i < files->size)
 	{
 		params[0] += f_ptr->f_stat.st_blocks;
-		params[1] = ft_max(params[1], f_ptr->f_stat.st_nlink);
-		params[2] = ft_max(params[2], ft_strlen(f_ptr->user->pw_name));
-		params[3] = ft_max(params[3], ft_strlen(f_ptr->group->gr_name));
-		params[4] = ft_max(params[4], f_ptr->f_stat.st_size);
+		params[1] = ft_maxs(params[1], f_ptr->f_stat.st_nlink);
+		params[2] = ft_maxs(params[2], ft_strlen(f_ptr->username));
+		params[3] = ft_maxs(params[3], ft_strlen(f_ptr->groupname));
+		params[4] = ft_maxs(params[4], f_ptr->f_stat.st_size);
 		++i;
 		++f_ptr;
 	}
 	params[0] = params[0] / 2;
-	params[1] = ft_int_len(params[1]);
-	params[4] = ft_int_len(params[4]);
+	params[1] = ft_size_t_len(params[1]);
+	params[4] = ft_size_t_len(params[4]);
 }
 
 /*
@@ -81,25 +84,19 @@ static void	get_line_params(t_darr *files, size_t *params)
 **	   |____________|
 */
 
-//	SIX MONTH ???
-
-void	ft_print_time(struct stat * s)
+void		ft_print_time(struct stat *s)
 {
 	time_t		n_time;
 	time_t		f_time;
 	char		*file_time;
-	static char	now_time[26];
 
-	f_time = s->st_ctime;
-	if ((s->st_mode & S_IFMT) == S_IFDIR)
-		f_time = s->st_mtime;
+	f_time = s->st_mtime;
 	n_time = time(NULL);
-	ft_strcpy(now_time, ctime(&n_time));
 	file_time = ctime(&f_time);
-	if (!ft_strcmp(ft_strrchr(file_time, ' '), ft_strrchr(now_time, ' ')))
-		ft_printf("%.13s ", (file_time + 3));
-	else
+	if (f_time - n_time > LS_6M || n_time - f_time > LS_6M)
 		ft_printf("%.7s %5.4s ", (file_time + 3), (file_time + 20));
+	else
+		ft_printf("%.13s ", (file_time + 3));
 }
 
 void		print_path(char *path)
@@ -134,11 +131,11 @@ void		ft_long_print(size_t opts, char *path, t_darr *files)
 	ft_printf("total %lu", params[0]);
 	while (i < files->size)
 	{
-		ft_printf("\n%s %*lu %*s %*s %*lu",\
+		ft_printf("\n%s %*lu %-*s %-*s %*lu",\
 			get_roots(f_ptr->f_stat.st_mode),\
 			params[1], f_ptr->f_stat.st_nlink,\
-			params[2], f_ptr->user->pw_name,\
-			params[3], f_ptr->group->gr_name,\
+			params[2], f_ptr->username,\
+			params[3], f_ptr->groupname,\
 			params[4], f_ptr->f_stat.st_size);
 		ft_print_time(&f_ptr->f_stat);
 		ft_printf("%s", f_ptr->filename);

@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/08 20:33:03 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/10 17:56:09 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/11 20:17:00 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,28 +24,27 @@ bool	show_visible(char *filename)
 
 int		name_less(void *p1, void *p2)
 {
-	int		i;
-	int		j;
 	char	*s1;
 	char	*s2;
 
 	s1 = (char*)((t_file*)p1)->filename;
 	s2 = (char*)((t_file*)p2)->filename;
-	i = 0;
-	j = 0;
-	while (s1[i] && s2[j])
+	while (*s1 && *s2)
 	{
-		if (ft_isalnum(s1[i]) && ft_isalnum(s2[j]))
+		if (ft_tolower(*s1) != ft_tolower(*s2))
 		{
-			if (ft_tolower(s1[i]) != ft_tolower(s2[j]))
+			if (ft_isalnum(*s1) && ft_isalnum(*s2))
 				break ;
-			++i;
-			++j;
+			s1 += !ft_isalnum(*s1);
+			s2 += !ft_isalnum(*s2);
 		}
-		i += !ft_isalnum(s1[i]);
-		j += !ft_isalnum(s2[j]);
+		else
+		{
+			++s1;
+			++s2;
+		}
 	}
-	return (ft_tolower(s1[i]) < ft_tolower(s2[j]));
+	return (ft_tolower(*s1) < ft_tolower(*s2));
 }
 
 int		rev_name(void *p1, void *p2)
@@ -63,7 +62,11 @@ int		time_less(void *p1, void *p2)
 	if (t1->tv_sec > t2->tv_sec)
 		return (1);
 	else if (t1->tv_sec == t2->tv_sec)
+	{
+		if (t1->tv_nsec == t2->tv_nsec)
+			return (name_less(p1, p2));
 		return (t1->tv_nsec > t2->tv_nsec);
+	}
 	return (0);
 }
 
@@ -84,6 +87,5 @@ t_opts	get_functors(size_t opts)
 		funct.less = opts & LS_REV_S ? &rev_time : &time_less;
 	else
 		funct.less = opts & LS_REV_S ? &rev_name : &name_less;
-
 	return (funct);
 }

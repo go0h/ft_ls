@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/07 14:21:18 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/10 18:44:19 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/11 20:22:06 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,12 +50,15 @@ enum
 # define LS_REV_S	0x80000000000
 # define LS_TIME	0x200000000000
 
+# define LS_6M		15811200
+
+
 typedef struct	s_file
 {
 	char			*filename;
 	char			*link;
-	struct passwd	*user;
-	struct group	*group;
+	char			*username;
+	char			*groupname;
 	struct stat		f_stat;
 }				t_file;
 
@@ -86,6 +89,8 @@ void		ft_long_print(size_t opts, char *path, t_darr *list);
 
 
 void		ft_exit(int err, char *path);
+
+void		ft_del_one_file(t_darr *files, size_t index);
 
 void		ft_del_files(t_darr **files);
 
