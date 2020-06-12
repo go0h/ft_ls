@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/12 11:09:56 by pcredibl          #+#    #+#             */
-/*   Updated: 2020/06/09 20:56:56 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/12 22:05:40 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ static int	check_flags(char *flags, size_t options)
 
 static int	check_option(char *str, size_t *options)
 {
-	int i;
+	int			i;
 
 	if (str[0] == '-')
 	{

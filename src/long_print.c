@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/09 08:32:58 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/11 22:31:43 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/12 22:06:56 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,25 +99,24 @@ void		ft_print_time(struct stat *s)
 		ft_printf("%.13s ", (file_time + 3));
 }
 
-void		print_path(char *path)
+void		print_files(t_opts *funct, char *path, t_darr *files)
 {
-	static bool first = true;
+	int	len;
 
-	if (first)
+	len = ft_strlen(path) - 1;
+	if (funct->opts & LS_PRPATH)
+		ft_printf("%.*s:\n", len, path);
+	ft_da_sort(files, funct->less);
+	funct->print(funct->opts, files);
+	if (funct->opts & LS_FISRSTPRINT)	// if first print path swich off flag
 	{
-		ft_printf("%s:\n", path);
-		while (*path++)
-		{
-			if (*path == '/' && *(path + 1) == '/')
-				*(path + 1) = '\0';
-		}
-		first = false;
+		while (len > 1 && path[len] == '/' && path[len - 1] == '/')
+			path[len--] = '\0';
+		funct->opts = funct->opts & (~LS_FISRSTPRINT);
 	}
-	else
-		ft_printf("\n%.*s:\n", ft_strlen(path) - 1, path);
 }
 
-void		ft_long_print(size_t opts, char *path, t_darr *files)
+void		ft_long_print(size_t opts, t_darr *files)
 {
 	size_t	i;
 	t_file	*f_ptr;
@@ -126,23 +125,21 @@ void		ft_long_print(size_t opts, char *path, t_darr *files)
 	i = 0;
 	f_ptr = (t_file*)files->array;
 	get_line_params(files, (size_t*)&params);
-	if (opts & LS_REC)
-		print_path(path);
-	ft_printf("total %lu", params[0]);
-	while (i < files->size)
+	if (!(opts & LS_NTOTL))
+		ft_printf("total %lu\n", params[0]);
+	while (i++ < files->size)
 	{
-		ft_printf("\n%s %*lu %-*s %-*s %*lu",\
+		ft_printf("%s %*lu %-*s %-*s %*lu",\
 			get_roots(f_ptr->f_stat.st_mode),\
 			params[1], f_ptr->f_stat.st_nlink,\
 			params[2], f_ptr->username,\
 			params[3], f_ptr->groupname,\
 			params[4], f_ptr->f_stat.st_size);
 		ft_print_time(&f_ptr->f_stat);
-		ft_printf("%s", f_ptr->filename);
 		if ((f_ptr->f_stat.st_mode & S_IFMT) == S_IFLNK)
-			ft_printf(" -> %s", f_ptr->link);
-		++i;
+			ft_printf("%s -> %s\n", f_ptr->filename, f_ptr->link);
+		else
+			ft_printf("%s\n", f_ptr->filename);
 		++f_ptr;
 	}
-	ft_printf("\n");
 }

@@ -6,13 +6,13 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/07 19:33:08 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/11 20:18:15 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/12 18:09:24 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ls.h"
 
-void	ft_exit(int err, char *path)
+void	ft_exit(int err, const char *path)
 {
 	if (err == E_OPEN)
 		ft_printf("Can't open dir %s\n", path);
@@ -48,7 +48,7 @@ void	ft_del_one_file(t_darr *files, size_t index)
 	ft_da_del_index(files, index);
 }
 
-void	ft_error_handle(char *msg)
+void	ft_error_handle(const char *msg)
 {
 	ft_fprintf(STDERR_FILENO, "%s: ", msg);
 	perror(NULL);

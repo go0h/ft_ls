@@ -6,7 +6,7 @@
 #    By: astripeb <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/11/07 15:14:49 by pcredibl          #+#    #+#              #
-#    Updated: 2020/06/10 10:12:28 by astripeb         ###   ########.fr        #
+#    Updated: 2020/06/12 10:01:16 by astripeb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -40,7 +40,7 @@ DEPEND				:= -MD -MT
 ################################################################################
 
 SRC					:= main.c options.c dir_funcs.c ft_exit.c\
-					functors.c short_print.c long_print.c
+					functors.c short_print.c long_print.c read_file_stat.c
 
 ################################################################################
 #																	 		   #

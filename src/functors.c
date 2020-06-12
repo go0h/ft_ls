@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/08 20:33:03 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/11 20:17:00 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/12 15:26:29 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,5 +87,9 @@ t_opts	get_functors(size_t opts)
 		funct.less = opts & LS_REV_S ? &rev_time : &time_less;
 	else
 		funct.less = opts & LS_REV_S ? &rev_name : &name_less;
+	if (funct.opts & LS_REC)
+		funct.opts = funct.opts | LS_PRPATH;
+	if (funct.opts & LS_PRPATH)
+		funct.opts = funct.opts | LS_FISRSTPRINT;
 	return (funct);
 }

@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/08 20:26:59 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/11 20:24:07 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/12 21:07:28 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,34 +16,6 @@
 static bool	not_ref(char *filename)
 {
 	return (ft_strcmp(filename, ".") && ft_strcmp(filename, ".."));
-}
-
-int			ft_read_file_stat(size_t opts, t_file *file, char *path)
-{
-	size_t			size;
-	struct passwd	*user;
-	struct group	*group;
-
-	if (lstat(path, &file->f_stat) == -1)
-		return (EXIT_FAILURE);
-	if (!(opts & LS_LONG))
-		return (EXIT_SUCCESS);
-	user = getpwuid(file->f_stat.st_uid);
-	group = getgrgid(file->f_stat.st_gid);
-	if (!user || !group)
-		return (EXIT_FAILURE);
-	file->username = ft_strdup(user->pw_name);
-	file->groupname = ft_strdup(group->gr_name);
-	if (!file->username || !file->groupname)
-		return (EXIT_FAILURE);
-	if ((file->f_stat.st_mode & S_IFMT) != S_IFLNK)
-		return (EXIT_SUCCESS);
-	size = !file->f_stat.st_size ? PATH_MAX : file->f_stat.st_size;
-	if (!(file->link = ft_strnew(size)))
-		return (EXIT_FAILURE);
-	if (readlink(path, file->link, size) == -1)
-		return (EXIT_FAILURE);
-	return (EXIT_SUCCESS);
 }
 
 int			ft_read_dir(t_opts *funct, char *path, t_darr *files)
@@ -93,7 +65,7 @@ void		ft_read_stats(size_t opts, t_darr *files, char *path)
 		}
 		++i;
 	}
-	ft_bzero(&path[len], ft_strlen(file->filename));
+	ft_bzero(&path[len], 256);
 }
 
 void		ft_process_next(t_opts *funct, t_darr *files, char *path)
@@ -110,6 +82,7 @@ void		ft_process_next(t_opts *funct, t_darr *files, char *path)
 		if ((file->f_stat.st_mode & S_IFDIR) && not_ref(file->filename))
 		{
 			ft_strcpy(&path[len], file->filename);
+			ft_printf("\n");
 			ft_read_root(funct, path);
 		}
 		++i;
@@ -128,8 +101,7 @@ int			ft_read_root(t_opts *funct, char *path)
 		return (EXIT_FAILURE);
 	}
 	ft_read_stats(funct->opts, files, path);
-	ft_da_sort(files, funct->less);
-	funct->print(funct->opts, path, files);
+	print_files(funct, path, files);
 	if (funct->opts & LS_REC)
 		ft_process_next(funct, files, path);
 	ft_del_files(&files);
