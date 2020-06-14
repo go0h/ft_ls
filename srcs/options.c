@@ -6,21 +6,30 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/12 11:09:56 by pcredibl          #+#    #+#             */
-/*   Updated: 2020/06/12 22:05:40 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/14 21:14:46 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ls.h"
 
-static void	usage(void)
+static void	usage(char *prog, char *opt, int err)
 {
-	ft_printf("Usage: ft_ls [OPTION]... [FILE]...\n");
-	ft_printf("   -a\tdo not ignore entries starting with .\n");
-	ft_printf("   -l\tuse a long listing format\n");
-	ft_printf("   -R\tlist subdirectories recursively\n");
-	ft_printf("   -r\treverse order while sorting\n");
-	ft_printf("   -t\tsort by modification time, newest first\n");
-	exit(EXIT_SUCCESS);
+	if (err == USAGE)
+	{
+		ft_printf("Usage: ft_ls [OPTION]... [FILE]...\n");
+		ft_printf("   -a\tdo not ignore entries starting with .\n");
+		ft_printf("   -l\tuse a long listing format\n");
+		ft_printf("   -R\tlist subdirectories recursively\n");
+		ft_printf("   -r\treverse order while sorting\n");
+		ft_printf("   -t\tsort by modification time, newest first\n");
+		exit(EXIT_SUCCESS);
+	}
+	else if (err == INVALID_OPTION)
+	{
+		ft_printf("%s: invalid option -- '%s'\n", prog, opt);
+		ft_printf("Try '%s -h' for more information.\n", prog);
+		exit(INVALID_OPTION);
+	}
 }
 
 static int	check_flags(char *flags, size_t options)
@@ -61,33 +70,37 @@ static int	check_option(char *str, size_t *options)
 				return (-1);
 			++i;
 		}
+		return (0);
 	}
-	return (0);
+	return (2);
 }
 
 size_t		options(int ac, char **av)
 {
 	int			i;
-	int			check;
+	int			ret;
+	int			files;
 	size_t		options;
 
-	options = 0;
 	i = 1;
+	files = 0;
+	options = 0;
 	while (i < ac)
 	{
-		check = check_option(av[i], &options);
-		if (check == 1)
-			usage();
-		if (check == -1)
-		{
-			ft_printf("%s: invalid option -- '%s'\n", av[0], av[i]);
-			ft_printf("Try '%s -h' for more information.\n", av[0]);
-			exit(EXIT_FAILURE);
-		}
+		if ((ret = check_option(av[i], &options)) == 1)
+			usage(av[0], av[i], USAGE);
+		else if (ret == -1)
+			usage(av[0], av[i], INVALID_OPTION);
+		else if (ret == 2)
+			files++;
 		++i;
 	}
 	if (!check_flags("lartR", options))
-		usage();
+		usage(av[0], av[i], USAGE);
+	if (files > 1)
+		options |= LS_PRPATH;
+	else if (files == 0)
+		options |= LS_NOFILES;
 	return (options);
 }
 

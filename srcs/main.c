@@ -6,26 +6,30 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/07 14:22:13 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/12 22:07:08 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/14 21:08:55 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ls.h"
 #include <limits.h>
 
-t_darr	*read_args(t_opts funct, int ac, char **argv)
+/*
+**	Read args from command line, and read all files with lstat function
+**	and add to array of t_file structs
+**	On success return t_file array
+**	On error return return NULL
+*/
+
+static t_darr	*read_args(t_opts funct, int ac, char **argv)
 {
 	int		i;
 	t_file	file;
 	t_darr	*files;
 
-	if (!(files = ft_da_new(ac - 1, sizeof(t_file))))
-	{
-		ft_error_handle(__FUNCTION__);
-		return (NULL);
-	}
-	ft_bzero(&file, sizeof(t_file));
 	i = 0;
+	ft_bzero(&file, sizeof(t_file));
+	if (!(files = ft_da_new(ac - 1, sizeof(t_file))))
+		return (NULL);
 	while (++i < ac)
 	{
 		if (*argv[i] == '-')
@@ -33,7 +37,8 @@ t_darr	*read_args(t_opts funct, int ac, char **argv)
 		file.filename = ft_strdup(argv[i]);
 		if (!file.filename || ft_read_file_stat(funct.opts, &file, argv[i]))
 		{
-			ft_error_handle(__FUNCTION__);
+			ft_strdel(&file.filename);
+			ft_error_handle(argv[i]);
 			continue;
 		}
 		files = ft_da_add(files, &file);
@@ -42,12 +47,46 @@ t_darr	*read_args(t_opts funct, int ac, char **argv)
 	return (files);
 }
 
-t_darr	*separate_files(t_darr *files)
+/*
+**	Check if file is Directory
+**	If opts -l is off and file is Symbolic link to directory,
+**	read file with stat function.
+**
+**	On success return 1 if file Directory or 0 if other
+**	On error return return -1
+*/
+
+
+static int		selection(size_t opts, t_file *file)
 {
-	size_t		i;
-	t_file		*file;
-	t_darr		*regfiles;
 	__mode_t	file_type;
+
+	file_type = file->f_stat.st_mode & S_IFMT;
+	if (file_type == S_IFDIR)
+		return (1);
+	else if (file_type == S_IFLNK && !(opts & LS_LONG))
+	{
+		if (stat(file->filename, &file->f_stat) == -1)
+			return (-1);
+		file_type = file->f_stat.st_mode & S_IFMT;
+		if (file_type == S_IFDIR)
+			return (1);
+	}
+	return (0);
+}
+
+/*
+**	Check files in array and add regfiles to new array
+**	On success return t_file array of regular files
+**	On error return return NULL
+*/
+
+static t_darr	*separate_files(size_t opts, t_darr *files)
+{
+	size_t	i;
+	int		res;
+	t_file	*file;
+	t_darr	*regfiles;
 
 	if (!files->size || !(regfiles = ft_da_new(files->size, sizeof(t_file))))
 		return (NULL);
@@ -55,19 +94,24 @@ t_darr	*separate_files(t_darr *files)
 	while (i < files->size)
 	{
 		file = (t_file*)ft_da_get_pointer(files, i);
-		file_type = file->f_stat.st_mode & S_IFMT;
-		if (file_type == S_IFDIR)
+		if ((res = selection(opts, file)) == -1)
+			ft_error_handle(__FUNCTION__);
+		else if (res == 0)
 		{
-			++i;
-			continue;
+			regfiles = ft_da_add(regfiles, file);
+			ft_da_del_index(files, i);
 		}
-		regfiles = ft_da_add(regfiles, file);
-		ft_da_del_index(files, i);
+		else
+			++i;
 	}
 	return (regfiles);
 }
 
-void	ft_go_ls(t_opts funct, t_darr *dirs, t_darr *files, char *path)
+/*
+**	Prints files if it in args, and start to read args Directoties
+*/
+
+static void		ft_go_ls(t_opts funct, t_darr *dirs, t_darr *files, char *path)
 {
 	size_t	i;
 	t_file	*file;
@@ -82,15 +126,13 @@ void	ft_go_ls(t_opts funct, t_darr *dirs, t_darr *files, char *path)
 	{
 		i != 0 ? ft_printf("\n") : 0;
 		file = ft_da_get_pointer(dirs, i++);
-		ft_strcpy(path, file->filename);
-		ft_read_root(&funct, path);
+		ft_read_root(&funct, ft_strcpy(path, file->filename));
 	}
-	i == 0 ? ft_read_root(&funct, path) : 0;
 	ft_del_files(&dirs);
 	ft_del_files(&files);
 }
 
-int		main(int argc, char **argv)
+int				main(int argc, char **argv)
 {
 	t_opts	funct;
 	char	*pathname;
@@ -100,16 +142,18 @@ int		main(int argc, char **argv)
 	funct = get_functors(options(argc, argv));
 	if (!(pathname = ft_strnew(PATH_MAX - 1)))
 		ft_exit(E_MALLOC, __FUNCTION__);
-	ft_strcpy(pathname, ".");
-	if (!(files = read_args(funct, argc, argv)))
+	if (funct.opts & LS_NOFILES)
+		ft_read_root(&funct, ft_strcpy(pathname, "."));
+	else
 	{
-		ft_strdel(&pathname);
-		ft_exit(E_MALLOC, __FUNCTION__);
+		if (!(files = read_args(funct, argc, argv)))
+		{
+			ft_strdel(&pathname);
+			ft_exit(E_MALLOC, __FUNCTION__);
+		}
+		regfiles = separate_files(funct.opts, files);
+		ft_go_ls(funct, files, regfiles, pathname);
 	}
-	if (files->size > 1)
-		funct.opts |= LS_PRPATH;
-	regfiles = separate_files(files);
-	ft_go_ls(funct, files, regfiles, pathname);
 	ft_strdel(&pathname);
 	return (EXIT_SUCCESS);
 }

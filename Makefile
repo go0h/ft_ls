@@ -6,7 +6,7 @@
 #    By: astripeb <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/11/07 15:14:49 by pcredibl          #+#    #+#              #
-#    Updated: 2020/06/12 10:01:16 by astripeb         ###   ########.fr        #
+#    Updated: 2020/06/13 15:48:28 by astripeb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,13 +24,13 @@ LIB_DIR				:= ./libft
 LIBFT				:= libft.a
 
 #PROJECT_DIRS
-INC_DIR				:= ./inc
+INC_DIR				:= ./includes
 OBJ_DIR				:= ./obj
-SRC_DIR				:= ./src
+SRC_DIR				:= ./srcs
 
 #COMPILER FLAGS
 CFLAGS				?= -Wall -Wextra -Werror
-LFLAGS				:= -I $(LIB_DIR)/inc -I $(INC_DIR)
+LFLAGS				:= -I $(LIB_DIR)/includes -I $(INC_DIR)
 LIB					:= -L $(LIB_DIR) -lft
 DEPEND				:= -MD -MT
 
@@ -87,6 +87,6 @@ re: fclean all
 
 include $(wildcard $(OBJ_DIR)/*.d)
 
-.SILENT: all clean fclean re lib Debug $(NAME) $(OBJ) $(OBJ_DIR)
+.SILENT: all clean lib Debug re fclean $(NAME) $(OBJ) $(OBJ_DIR)
 
 .PHONY: clean fclean re all Debug
