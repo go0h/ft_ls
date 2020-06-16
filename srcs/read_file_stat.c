@@ -6,11 +6,16 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/12 10:00:25 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/12 10:37:33 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/16 11:38:48 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ls.h"
+
+/*
+**	Extended attributes
+**	TODO
+*/
 
 int			ft_read_file_stat(size_t opts, t_file *file, char *path)
 {

@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/07 14:21:18 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/14 21:07:02 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/16 16:18:01 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,20 +35,21 @@
 # include "stdbool.h"
 # include "libft.h"
 
-enum
+typedef enum	e_error
 {
+	NONE,
 	USAGE,
-	E_SYS,
 	INVALID_OPTION,
-	E_MALLOC,
-	E_OPEN,
-};
+	SYS,
+	MALLOC
+}				t_error;
 
 # define LS_REC			0x20000
 # define LS_ALL			0x4000000
 # define LS_LONG		0x2000000000
 # define LS_REV_S		0x80000000000
 # define LS_TIME		0x200000000000
+# define LS_ONE_LINE	0x20000000000000
 # define LS_NOFILES		0x1000000000000000
 # define LS_FISRSTPRINT	0x2000000000000000
 # define LS_NTOTL		0x4000000000000000
@@ -73,38 +74,28 @@ typedef struct	s_opts
 	void		(*print)(size_t opts, t_darr *files);
 }				t_opts;
 
+size_t			options(int ac, char **av);
 
-size_t		options(int ac, char **av);
+t_opts			get_functors(size_t opts);
 
-void		print_opts(size_t opts);
+bool			show_all(char *filename);
 
-t_opts		get_functors(size_t opts);
+bool			show_visible(char *filename);
 
+int				ft_read_root(t_opts *funct, char *path);
 
+int				ft_read_file_stat(size_t opts, t_file *file, char *path);
 
-void		ft_process_next(t_opts *funct, t_darr *files, char *path);
+void			print_files(t_opts *funct, char *path, t_darr *list);
 
-int			ft_read_root(t_opts *funct, char *path);
+void			ft_short_print(size_t opts, t_darr *list);
 
-int			ft_read_file_stat(size_t opts, t_file *file, char *path);
+void			ft_long_print(size_t opts, t_darr *list);
 
+void			ft_error_handle(const char *msg, t_error err);
 
+void			ft_del_one_file(t_darr *files, size_t index);
 
-void		print_files(t_opts *funct, char *path, t_darr *list);
-
-void		ft_short_print(size_t opts, t_darr *list);
-
-void		ft_long_print(size_t opts, t_darr *list);
-
-void		ft_exit(int err, const char *path);
-
-void		ft_del_one_file(t_darr *files, size_t index);
-
-void		ft_del_files(t_darr **files);
-
-void		free_content(void *content);
-
-void		ft_error_handle(const char *msg);
-
+void			ft_del_files(t_darr **files);
 
 #endif

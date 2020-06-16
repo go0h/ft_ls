@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/08 20:26:59 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/12 21:07:28 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/16 16:15:36 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,19 +28,19 @@ int			ft_read_dir(t_opts *funct, char *path, t_darr *files)
 	ret = 0;
 	ft_bzero(&file, sizeof(t_file));
 	if (!(dirp_ptr = opendir(path)))
-		ret = E_SYS;
+		ret = SYS;
 	while (!ret && (dir = readdir(dirp_ptr)) != NULL)
 	{
 		if (funct->isshow(dir->d_name))
 		{
 			if (!(file.filename = ft_strdup(dir->d_name)))
-				ret = E_MALLOC;
+				ret = MALLOC;
 			if (ret || !(files = ft_da_add(files, &file)))
-				ret = E_MALLOC;
+				ret = MALLOC;
 		}
 	}
 	if (ret)
-		ft_error_handle(path);
+		ft_error_handle(path, ret);
 	closedir(dirp_ptr);
 	return (ret);
 }
@@ -61,7 +61,7 @@ void		ft_read_stats(size_t opts, t_darr *files, char *path)
 		if (ft_read_file_stat(opts, file, path))
 		{
 			ft_del_one_file(files, i--);
-			ft_error_handle(path);
+			ft_error_handle(path, SYS);
 		}
 		++i;
 	}
@@ -94,7 +94,7 @@ int			ft_read_root(t_opts *funct, char *path)
 	t_darr			*files;
 
 	if (!(files = ft_da_new(2, sizeof(t_file))))
-		return (E_MALLOC);
+		return (MALLOC);
 	if ((ft_read_dir(funct, path, files)) != 0)
 	{
 		ft_del_files(&files);

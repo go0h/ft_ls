@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/09 08:32:58 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/12 22:06:56 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/16 16:15:12 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@
 **	S_ISUID		0004000		set-user-ID
 **	S_ISGID		0002000		set-group-ID
 **	S_ISVTX		0001000		sticky bit
+**	"?pcdb-lswd";
 */
 
 static char	*get_roots(mode_t st_mode)
@@ -57,17 +58,16 @@ static void	get_line_params(t_darr *files, size_t *params)
 	size_t	i;
 	t_file	*f_ptr;
 
-	i = 0;
+	i = files->size;
 	f_ptr = (t_file*)files->array;
 	ft_bzero(params, sizeof(size_t) * 5);
-	while (i < files->size)
+	while (i-- != 0)
 	{
 		params[0] += f_ptr->f_stat.st_blocks;
 		params[1] = ft_maxs(params[1], f_ptr->f_stat.st_nlink);
 		params[2] = ft_maxs(params[2], ft_strlen(f_ptr->username));
 		params[3] = ft_maxs(params[3], ft_strlen(f_ptr->groupname));
 		params[4] = ft_maxs(params[4], f_ptr->f_stat.st_size);
-		++i;
 		++f_ptr;
 	}
 	params[0] = params[0] / 2;
@@ -108,7 +108,7 @@ void		print_files(t_opts *funct, char *path, t_darr *files)
 		ft_printf("%.*s:\n", len, path);
 	ft_da_sort(files, funct->less);
 	funct->print(funct->opts, files);
-	if (funct->opts & LS_FISRSTPRINT)	// if first print path swich off flag
+	if (funct->opts & LS_FISRSTPRINT)
 	{
 		while (len > 1 && path[len] == '/' && path[len - 1] == '/')
 			path[len--] = '\0';
@@ -122,12 +122,12 @@ void		ft_long_print(size_t opts, t_darr *files)
 	t_file	*f_ptr;
 	size_t	params[5];
 
-	i = 0;
+	i = files->size;
 	f_ptr = (t_file*)files->array;
 	get_line_params(files, (size_t*)&params);
 	if (!(opts & LS_NTOTL))
 		ft_printf("total %lu\n", params[0]);
-	while (i++ < files->size)
+	while (i-- != 0)
 	{
 		ft_printf("%s %*lu %-*s %-*s %*lu",\
 			get_roots(f_ptr->f_stat.st_mode),\

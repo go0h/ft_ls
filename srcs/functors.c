@@ -6,21 +6,11 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/08 20:33:03 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/12 15:26:29 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/16 16:16:28 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ls.h"
-
-bool	show_all(char *filename)
-{
-	return (filename != NULL);
-}
-
-bool	show_visible(char *filename)
-{
-	return (*filename != '.');
-}
 
 int		name_less(void *p1, void *p2)
 {

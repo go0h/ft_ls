@@ -1,17 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_ls.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/07 14:22:13 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/14 21:08:55 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/06/16 13:08:12 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ls.h"
 #include <limits.h>
+
+const char *g_prog_name;
 
 /*
 **	Read args from command line, and read all files with lstat function
@@ -38,7 +40,7 @@ static t_darr	*read_args(t_opts funct, int ac, char **argv)
 		if (!file.filename || ft_read_file_stat(funct.opts, &file, argv[i]))
 		{
 			ft_strdel(&file.filename);
-			ft_error_handle(argv[i]);
+			ft_error_handle(argv[i], SYS);
 			continue;
 		}
 		files = ft_da_add(files, &file);
@@ -55,7 +57,6 @@ static t_darr	*read_args(t_opts funct, int ac, char **argv)
 **	On success return 1 if file Directory or 0 if other
 **	On error return return -1
 */
-
 
 static int		selection(size_t opts, t_file *file)
 {
@@ -95,7 +96,7 @@ static t_darr	*separate_files(size_t opts, t_darr *files)
 	{
 		file = (t_file*)ft_da_get_pointer(files, i);
 		if ((res = selection(opts, file)) == -1)
-			ft_error_handle(__FUNCTION__);
+			ft_error_handle(file->filename, SYS);
 		else if (res == 0)
 		{
 			regfiles = ft_da_add(regfiles, file);
@@ -139,9 +140,10 @@ int				main(int argc, char **argv)
 	t_darr	*files;
 	t_darr	*regfiles;
 
+	g_prog_name = argv[0];
 	funct = get_functors(options(argc, argv));
 	if (!(pathname = ft_strnew(PATH_MAX - 1)))
-		ft_exit(E_MALLOC, __FUNCTION__);
+		ft_error_handle(__FUNCTION__, MALLOC);
 	if (funct.opts & LS_NOFILES)
 		ft_read_root(&funct, ft_strcpy(pathname, "."));
 	else
@@ -149,7 +151,7 @@ int				main(int argc, char **argv)
 		if (!(files = read_args(funct, argc, argv)))
 		{
 			ft_strdel(&pathname);
-			ft_exit(E_MALLOC, __FUNCTION__);
+			ft_error_handle(__FUNCTION__, SYS);
 		}
 		regfiles = separate_files(funct.opts, files);
 		ft_go_ls(funct, files, regfiles, pathname);

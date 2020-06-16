@@ -6,7 +6,7 @@
 #    By: astripeb <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/11/07 15:14:49 by pcredibl          #+#    #+#              #
-#    Updated: 2020/06/13 15:48:28 by astripeb         ###   ########.fr        #
+#    Updated: 2020/06/16 13:05:42 by astripeb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,11 +25,11 @@ LIBFT				:= libft.a
 
 #PROJECT_DIRS
 INC_DIR				:= ./includes
-OBJ_DIR				:= ./obj
+OBJ_DIR				:= ./.obj
 SRC_DIR				:= ./srcs
 
 #COMPILER FLAGS
-CFLAGS				?= -Wall -Wextra -Werror
+CFLAGS				?= -Wall -Wextra -Werror -O3
 LFLAGS				:= -I $(LIB_DIR)/includes -I $(INC_DIR)
 LIB					:= -L $(LIB_DIR) -lft
 DEPEND				:= -MD -MT
@@ -39,7 +39,7 @@ DEPEND				:= -MD -MT
 #									SOURCE FILES					 		   #
 ################################################################################
 
-SRC					:= main.c options.c dir_funcs.c ft_exit.c\
+SRC					:= ft_ls.c options.c dir_funcs.c ft_utils.c\
 					functors.c short_print.c long_print.c read_file_stat.c
 
 ################################################################################
@@ -56,11 +56,11 @@ vpath %.a $(LIB_DIR)
 all: lib $(NAME)
 
 $(NAME): $(LIBFT) $(OBJ)
-	$(CC) $(CFLAGS) $(LFLAGS) $(addprefix $(OBJ_DIR)/, $(OBJ)) $(LIB) -o $@
+	$(CC) $(CFLAGS) $(LFLAGS) $(addprefix $(OBJ_DIR)/, $(OBJ)) -o $@ $(LIB)
 	echo "$(GREEN)$@ was created ✅$(RESET)"
 
 $(OBJ):%.o:%.c | $(OBJ_DIR)
-	$(CC) $(CFLAGS) $(LFLAGS) -o $(OBJ_DIR)/$@ -c $< $(DEPEND) $@
+	$(CC) $(CFLAGS) $(LFLAGS) -c $< -o $(OBJ_DIR)/$@ $(DEPEND) $@
 	echo "$(GREEN)$@ was created$(RESET)"
 
 lib:
