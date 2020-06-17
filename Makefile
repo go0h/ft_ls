@@ -6,13 +6,16 @@
 #    By: astripeb <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/11/07 15:14:49 by pcredibl          #+#    #+#              #
-#    Updated: 2020/06/16 13:05:42 by astripeb         ###   ########.fr        #
+#    Updated: 2020/06/17 18:24:24 by astripeb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 GREEN 				:= \033[0;32m
 RED 				:= \033[0;31m
 RESET				:= \033[0m
+BLINK				:= \033[5m
+NORMAL				:= \033[25m
+BOLDU				:= \033[1m\033[4m
 
 NAME				:= ft_ls
 
@@ -39,8 +42,9 @@ DEPEND				:= -MD -MT
 #									SOURCE FILES					 		   #
 ################################################################################
 
-SRC					:= ft_ls.c options.c dir_funcs.c ft_utils.c\
-					functors.c short_print.c long_print.c read_file_stat.c
+SRC					:= ls_main.c ls_options.c ls_dir_funcs.c ls_utils.c\
+					ls_functors.c ls_short_print.c ls_long_print.c\
+					ls_read_file_stat.c
 
 ################################################################################
 #																	 		   #
@@ -57,11 +61,12 @@ all: lib $(NAME)
 
 $(NAME): $(LIBFT) $(OBJ)
 	$(CC) $(CFLAGS) $(LFLAGS) $(addprefix $(OBJ_DIR)/, $(OBJ)) -o $@ $(LIB)
-	echo "$(GREEN)$@ was created ✅$(RESET)"
+	echo "$(GREEN)Creating $(BOLDU)$@$(RESET)"
+	echo "$(GREEN)$(BLINK)DONE✅$(NORMAL)$(RESET)"
 
 $(OBJ):%.o:%.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(LFLAGS) -c $< -o $(OBJ_DIR)/$@ $(DEPEND) $@
-	echo "$(GREEN)$@ was created$(RESET)"
+	echo "$(GREEN)Creating $(BOLDU)$@$(RESET)"
 
 lib:
 	$(MAKE) -C $(LIB_DIR)
@@ -75,13 +80,13 @@ Debug:
 clean:
 	$(MAKE) clean -C $(LIB_DIR)
 	rm -rf $(OBJ_DIR)
-	echo "$(RED)objs files was deleted$(RESET)"
+	echo "$(RED)Deleting $(BOLDU)objs files$(RESET)"
 
 fclean: clean
 	$(MAKE) fclean -C $(LIB_DIR)
-	echo "$(RED)$(LIBFT) was deleted$(RESET)"
+	echo "$(RED)Deleting $(BOLDU)$(LIBFT)$(RESET)"
 	rm -rf $(NAME)
-	echo "$(RED)$(NAME) was deleted$(RESET)"
+	echo "$(RED)Deleting $(BOLDU)$(NAME)$(RESET)"
 
 re: fclean all
 
