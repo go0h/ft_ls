@@ -6,7 +6,7 @@
 #    By: astripeb <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/11/07 15:14:49 by pcredibl          #+#    #+#              #
-#    Updated: 2020/06/17 18:24:24 by astripeb         ###   ########.fr        #
+#    Updated: 2020/07/02 20:36:41 by astripeb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -75,7 +75,7 @@ $(OBJ_DIR):
 	mkdir -p $@
 
 Debug:
-	$(MAKE) CFLAGS="-g"
+	$(MAKE) CFLAGS="-g3"
 
 clean:
 	$(MAKE) clean -C $(LIB_DIR)

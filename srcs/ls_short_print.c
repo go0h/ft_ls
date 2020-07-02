@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/10 10:07:47 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/17 18:23:41 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/07/02 21:00:25 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ void			ft_short_print(size_t opts, t_darr *files)
 	}
 	i = 0;
 	calc_rows_cols(params, files);
-	while (files->size && i < params[2])
+	while (i < files->size && i < params[2])
 	{
 		j = i;
 		while (j < files->size)

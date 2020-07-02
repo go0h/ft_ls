@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/07 14:22:13 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/17 18:23:32 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/07/02 20:44:32 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,10 @@ static t_darr	*separate_files(size_t opts, t_darr *files)
 	{
 		file = (t_file*)ft_da_get_pointer(files, i);
 		if ((res = selection(opts, file)) == -1)
+		{
 			ft_error_handle(file->filename, SYS);
+			ft_del_one_file(files, i);
+		}
 		else if (res == 0)
 		{
 			regfiles = ft_da_add(regfiles, file);
