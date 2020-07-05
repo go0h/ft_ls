@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/09 08:32:58 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/17 18:23:27 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/07/05 14:51:22 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,12 @@
 
 /*
 **	S_IFMT	   00170000		MASK
-**	S_IFSOCK	0140000		socket
+**	S_IFSOCK	0140000		socket					/tmp/.X11-unix/
 **	S_IFLNK		0120000		symbolic (soft) link
 **	S_IFREG		0100000		regular file
-**	S_IFBLK		0060000		block device
+**	S_IFBLK		0060000		block device			/dev/sda
 **	S_IFDIR		0040000		directory
-**	S_IFCHR		0020000		character device
+**	S_IFCHR		0020000		character device		/dev/null
 **	S_IFIFO		0010000		FIFO or pipe
 **
 **	S_ISUID		0004000		set-user-ID
@@ -53,26 +53,44 @@ static char	*get_roots(mode_t st_mode)
 	return ((char*)&roots);
 }
 
-static void	get_line_params(t_darr *files, size_t *params)
+/*
+**	PARAMS ARRAY indexes:
+**	0 - sum of blocks of all files in dir
+**	1 - max links in one file of all files in dir
+**	2 - max length of usernames
+**	3 - max length of groupnames
+**	4 - max device major number (only for char and block devices)
+**	5 - max device minor number (only for char and block devices)
+**	6 - max size of file size
+*/
+
+static void	get_line_param(t_darr *files, size_t *param)
 {
 	size_t	i;
 	t_file	*f_ptr;
 
 	i = files->size;
 	f_ptr = (t_file*)files->array;
-	ft_bzero(params, sizeof(size_t) * 5);
+	ft_bzero(param, sizeof(size_t) * 7);
 	while (i-- != 0)
 	{
-		params[0] += f_ptr->f_stat.st_blocks;
-		params[1] = ft_maxs(params[1], f_ptr->f_stat.st_nlink);
-		params[2] = ft_maxs(params[2], ft_strlen(f_ptr->username));
-		params[3] = ft_maxs(params[3], ft_strlen(f_ptr->groupname));
-		params[4] = ft_maxs(params[4], f_ptr->f_stat.st_size);
+		param[0] += f_ptr->f_stat.st_blocks;
+		param[1] = ft_maxs(param[1], f_ptr->f_stat.st_nlink);
+		param[2] = ft_maxs(param[2], ft_strlen(f_ptr->username));
+		param[3] = ft_maxs(param[3], ft_strlen(f_ptr->groupname));
+		if (isblk(f_ptr->f_stat.st_mode) || ischr(f_ptr->f_stat.st_mode))
+		{
+			param[4] = ft_maxs(param[4], major(f_ptr->f_stat.st_rdev));
+			param[5] = ft_maxs(param[5], minor(f_ptr->f_stat.st_rdev));
+		}
+		param[6] = ft_maxs(param[6], f_ptr->f_stat.st_size);
 		++f_ptr;
 	}
-	params[0] = params[0] / 2;
-	params[1] = ft_size_t_len(params[1]);
-	params[4] = ft_size_t_len(params[4]);
+	param[0] = param[0] / 2;
+	param[1] = ft_size_t_len(param[1]);
+	param[4] = param[4] ? ft_size_t_len(param[4]) : 0;
+	param[5] = param[5] ? ft_size_t_len(param[5]) : 0;
+	param[6] = param[4] ? param[4] + param[5] + 1 : ft_size_t_len(param[6]);
 }
 
 /*
@@ -84,7 +102,7 @@ static void	get_line_params(t_darr *files, size_t *params)
 **	   |____________|
 */
 
-void		ft_print_time(struct stat *s)
+static void	ft_print_time(struct stat *s)
 {
 	time_t		n_time;
 	time_t		f_time;
@@ -99,44 +117,39 @@ void		ft_print_time(struct stat *s)
 		ft_printf("%.13s ", (file_time + 3));
 }
 
-void		print_files(t_opts *funct, char *path, t_darr *files)
+static void	ft_print_size(struct stat *s, size_t *param)
 {
-	int	len;
-
-	len = ft_strlen(path) - 1;
-	if (funct->opts & LS_PRPATH)
-		ft_printf("%.*s:\n", len, path);
-	ft_da_sort(files, funct->less);
-	funct->print(funct->opts, files);
-	if (funct->opts & LS_FISRSTPRINT)
+	if (isblk(s->st_mode) || ischr(s->st_mode))
 	{
-		while (len > 1 && path[len] == '/' && path[len - 1] == '/')
-			path[len--] = '\0';
-		funct->opts = funct->opts & (~LS_FISRSTPRINT);
+		ft_printf("%*lu,%*lu",\
+		param[4], major(s->st_rdev),\
+		param[5], minor(s->st_rdev));
 	}
+	else
+		ft_printf("%*lu", param[6], s->st_size);
 }
 
 void		ft_long_print(size_t opts, t_darr *files)
 {
 	size_t	i;
 	t_file	*f_ptr;
-	size_t	params[5];
+	size_t	param[7];
 
 	i = files->size;
 	f_ptr = (t_file*)files->array;
-	get_line_params(files, (size_t*)&params);
+	get_line_param(files, (size_t*)&param);
 	if (!(opts & LS_NTOTL))
-		ft_printf("total %lu\n", params[0]);
+		ft_printf("total %lu\n", param[0]);
 	while (i-- != 0)
 	{
-		ft_printf("%s %*lu %-*s %-*s %*lu",\
+		ft_printf("%s %*lu %-*s %-*s ",\
 			get_roots(f_ptr->f_stat.st_mode),\
-			params[1], f_ptr->f_stat.st_nlink,\
-			params[2], f_ptr->username,\
-			params[3], f_ptr->groupname,\
-			params[4], f_ptr->f_stat.st_size);
+			param[1], f_ptr->f_stat.st_nlink,\
+			param[2], f_ptr->username,\
+			param[3], f_ptr->groupname);
+		ft_print_size(&f_ptr->f_stat, param);
 		ft_print_time(&f_ptr->f_stat);
-		if ((f_ptr->f_stat.st_mode & S_IFMT) == S_IFLNK)
+		if (islink(f_ptr->f_stat.st_mode))
 			ft_printf("%s -> %s\n", f_ptr->filename, f_ptr->link);
 		else
 			ft_printf("%s\n", f_ptr->filename);

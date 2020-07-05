@@ -6,7 +6,7 @@
 #    By: astripeb <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/11/07 15:14:49 by pcredibl          #+#    #+#              #
-#    Updated: 2020/07/02 20:36:41 by astripeb         ###   ########.fr        #
+#    Updated: 2020/07/05 12:09:40 by astripeb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -44,7 +44,7 @@ DEPEND				:= -MD -MT
 
 SRC					:= ls_main.c ls_options.c ls_dir_funcs.c ls_utils.c\
 					ls_functors.c ls_short_print.c ls_long_print.c\
-					ls_read_file_stat.c
+					ls_read_file_stat.c ls_print_files.c
 
 ################################################################################
 #																	 		   #

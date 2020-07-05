@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/07 14:21:18 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/16 16:18:01 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/07/05 14:43:29 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 **	<stdio.h>:					perror
 **	<string.h>:					strerror
 **	<time.h>:					time, ctime
+**	<sys/sysmacros.h>			major, minor
 */
 
 # include <sys/stat.h>
@@ -31,6 +32,7 @@
 # include <stdio.h>
 # include <string.h>
 # include <time.h>
+#include <sys/sysmacros.h>
 
 # include "stdbool.h"
 # include "libft.h"
@@ -55,7 +57,7 @@ typedef enum	e_error
 # define LS_NTOTL		0x4000000000000000
 # define LS_PRPATH		0x8000000000000000
 
-# define LS_6M			15811200
+# define LS_6M			15778458
 
 typedef struct	s_file
 {
@@ -97,5 +99,11 @@ void			ft_error_handle(const char *msg, t_error err);
 void			ft_del_one_file(t_darr *files, size_t index);
 
 void			ft_del_files(t_darr **files);
+
+bool			islink(mode_t mode);
+
+bool			isblk(mode_t mode);
+
+bool			ischr(mode_t mode);
 
 #endif

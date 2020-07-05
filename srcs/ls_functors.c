@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/08 20:33:03 by astripeb          #+#    #+#             */
-/*   Updated: 2020/06/17 18:23:22 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/07/05 15:56:42 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@ int		name_less(void *p1, void *p2)
 	{
 		if (ft_tolower(*s1) != ft_tolower(*s2))
 		{
-			if (ft_isalnum(*s1) && ft_isalnum(*s2))
+			if ((ft_isalnum(*s1) && ft_isalnum(*s2)) ||\
+			(!ft_isalnum(*s1) && !ft_isalnum(*s2)))
 				break ;
 			s1 += !ft_isalnum(*s1);
 			s2 += !ft_isalnum(*s2);
