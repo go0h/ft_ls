@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/12 10:00:25 by astripeb          #+#    #+#             */
-/*   Updated: 2020/07/05 14:57:35 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/07/05 21:45:24 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,4 +51,21 @@ bool		isblk(mode_t mode)
 bool		ischr(mode_t mode)
 {
 	return ((mode & S_IFMT) == S_IFCHR);
+}
+
+int			strcmp_l(const char *str1, const char *str2)
+{
+	unsigned char	*s1;
+	unsigned char	*s2;
+
+	s1 = (unsigned char*)str1;
+	s2 = (unsigned char*)str2;
+	while (*s1 && *s2)
+	{
+		if (ft_tolower(*s1) != ft_tolower(*s2))
+			return (*s1 - *s2);
+		++s1;
+		++s2;
+	}
+	return (*s1 - *s2);
 }

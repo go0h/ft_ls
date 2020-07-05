@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/07 14:21:18 by astripeb          #+#    #+#             */
-/*   Updated: 2020/07/05 14:43:29 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/07/05 22:49:42 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,9 @@
 # include <stdio.h>
 # include <string.h>
 # include <time.h>
-#include <sys/sysmacros.h>
+# include <sys/sysmacros.h>
+# include <stdbool.h>
 
-# include "stdbool.h"
 # include "libft.h"
 
 typedef enum	e_error
@@ -105,5 +105,7 @@ bool			islink(mode_t mode);
 bool			isblk(mode_t mode);
 
 bool			ischr(mode_t mode);
+
+int				strcmp_l(const char *str1, const char *str2);
 
 #endif

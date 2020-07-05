@@ -6,13 +6,13 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/08 20:33:03 by astripeb          #+#    #+#             */
-/*   Updated: 2020/07/05 15:56:42 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/07/05 22:08:00 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ls.h"
 
-int		name_less(void *p1, void *p2)
+int			name_less(void *p1, void *p2)
 {
 	char	*s1;
 	char	*s2;
@@ -23,8 +23,7 @@ int		name_less(void *p1, void *p2)
 	{
 		if (ft_tolower(*s1) != ft_tolower(*s2))
 		{
-			if ((ft_isalnum(*s1) && ft_isalnum(*s2)) ||\
-			(!ft_isalnum(*s1) && !ft_isalnum(*s2)))
+			if (ft_isalnum(*s1) && ft_isalnum(*s2))
 				break ;
 			s1 += !ft_isalnum(*s1);
 			s2 += !ft_isalnum(*s2);
@@ -35,15 +34,17 @@ int		name_less(void *p1, void *p2)
 			++s2;
 		}
 	}
-	return (ft_tolower(*s1) < ft_tolower(*s2));
+	if (*s1 || *s2)
+		return (ft_tolower(*s1) < ft_tolower(*s2));
+	return (strcmp_l(((t_file*)p1)->filename, ((t_file*)p2)->filename) < 0);
 }
 
-int		rev_name(void *p1, void *p2)
+int			rev_name(void *p1, void *p2)
 {
 	return (name_less(p2, p1));
 }
 
-int		time_less(void *p1, void *p2)
+int			time_less(void *p1, void *p2)
 {
 	struct timespec *t1;
 	struct timespec *t2;
@@ -61,12 +62,12 @@ int		time_less(void *p1, void *p2)
 	return (0);
 }
 
-int		rev_time(void *p1, void *p2)
+int			rev_time(void *p1, void *p2)
 {
 	return (time_less(p2, p1));
 }
 
-t_opts	get_functors(size_t opts)
+t_opts		get_functors(size_t opts)
 {
 	t_opts	funct;
 
