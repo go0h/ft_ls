@@ -6,7 +6,7 @@
 /*   By: astripeb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/09 08:32:58 by astripeb          #+#    #+#             */
-/*   Updated: 2020/07/05 14:51:22 by astripeb         ###   ########.fr       */
+/*   Updated: 2020/07/24 09:56:12 by astripeb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ static void	ft_print_time(struct stat *s)
 	f_time = s->st_mtime;
 	n_time = time(NULL);
 	file_time = ctime(&f_time);
-	if (f_time - n_time > LS_6M || n_time - f_time > LS_6M)
+	if (f_time > n_time || n_time - f_time > LS_6M)
 		ft_printf("%.7s %5.4s ", (file_time + 3), (file_time + 20));
 	else
 		ft_printf("%.13s ", (file_time + 3));
